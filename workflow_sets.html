@@ -49,12 +49,12 @@ In tidymodels, there is the idea that a model-oriented data analysis consists of
  - a preprocessor, and 
  - a model
  
-The preprocessor might be a simple formula or a sophisticated recipes.  
+The preprocessor might be a simple formula or a sophisticated recipe.  
 
-It's important to consider both of these activities as part of the data analysis process
+It's important to consider both of these activities as part of the data analysis process.
 
- - post-model activities should also be included there (e.g. calibration, cut-off optimization, etc.)
- - we don't have those implemented yet. 
+ - Post-model activities should also be included there (e.g. calibration, cut-off optimization, etc.)
+ - We don't have those implemented yet. 
 
 
 ---
@@ -173,7 +173,7 @@ modeling_data &lt;-
   prep(pca_rec, training = Chicago) %&gt;% 
   bake(new_data = NULL)
 
-bad &lt;- fit(reg_model, chicago_train)
+bad &lt;- fit(reg_model, modeling_data)
 
 predict(bad, chicago_test)
 ```
@@ -234,7 +234,7 @@ These are objects that contain multiple workflows.
 
 They can be estimated, evaluates, and ranked with simple APIs. 
 
-Let's create one by crossing several recipes with two models for the Chicago data
+Let's create one by crossing several recipes with two models for the Chicago data.
 
 ---
 # Example objects
@@ -318,7 +318,7 @@ chicago_res &lt;-
   workflow_map(resamples = chicago_rs,
                seed = 1, 
                # Optional arguments to tune_grid()
-               grid = 10,
+               grid = 20,
                metrics = metric_set(rmse))
 ```
 
@@ -360,14 +360,14 @@ chicago_res %&gt;%
 ## # A tibble: 8 x 6
 ##   wflow_id      .metric  mean std_err     n  rank
 ##   &lt;chr&gt;         &lt;chr&gt;   &lt;dbl&gt;   &lt;dbl&gt; &lt;int&gt; &lt;int&gt;
-## 1 pca_nnet      rmse     2.04   0.155    43     1
-## 2 basic_lm      rmse     2.08   0.146    43     2
-## 3 pls_lm        rmse     2.09   0.148    43     3
-## 4 pca_lm        rmse     2.09   0.142    43     4
-## 5 filtered_lm   rmse     2.09   0.145    43     5
-## 6 pls_nnet      rmse     2.09   0.153    43     6
-## 7 filtered_nnet rmse     2.11   0.158    43     7
-## 8 basic_nnet    rmse     2.15   0.163    43     8
+## 1 pls_nnet      rmse     2.01   0.169    43     1
+## 2 pls_lm        rmse     2.05   0.164    43     2
+## 3 pca_lm        rmse     2.05   0.159    43     3
+## 4 basic_lm      rmse     2.05   0.161    43     4
+## 5 pca_nnet      rmse     2.06   0.163    43     5
+## 6 filtered_lm   rmse     2.06   0.163    43     6
+## 7 filtered_nnet rmse     2.08   0.154    43     7
+## 8 basic_nnet    rmse     2.18   0.212    43     8
 ```
 
 
@@ -443,7 +443,7 @@ filtered_res &lt;-
   workflow_map(resamples = chicago_rs,
                seed = 1, 
                # Optional arguments to tune_grid()
-               grid = 10,
+               grid = 20,
                metrics = metric_set(rmse))
 ```
 
@@ -476,14 +476,14 @@ updated_res %&gt;%
 ## # A tibble: 8 x 6
 ##   wflow_id      .metric  mean std_err     n  rank
 ##   &lt;chr&gt;         &lt;chr&gt;   &lt;dbl&gt;   &lt;dbl&gt; &lt;int&gt; &lt;int&gt;
-## 1 pca_nnet      rmse     2.04   0.155    43     1
-## 2 filtered_nnet rmse     2.05   0.174    43     2
-## 3 filtered_lm   rmse     2.08   0.146    43     3
-## 4 basic_lm      rmse     2.08   0.146    43     4
-## 5 pls_lm        rmse     2.09   0.148    43     5
-## 6 pca_lm        rmse     2.09   0.142    43     6
-## 7 pls_nnet      rmse     2.09   0.153    43     7
-## 8 basic_nnet    rmse     2.15   0.163    43     8
+## 1 filtered_nnet rmse     1.97   0.154    43     1
+## 2 pls_nnet      rmse     2.01   0.169    43     2
+## 3 filtered_lm   rmse     2.05   0.160    43     3
+## 4 pls_lm        rmse     2.05   0.164    43     4
+## 5 pca_lm        rmse     2.05   0.159    43     5
+## 6 basic_lm      rmse     2.05   0.161    43     6
+## 7 pca_nnet      rmse     2.06   0.163    43     7
+## 8 basic_nnet    rmse     2.18   0.212    43     8
 ```
 ]
 .pull-right[
@@ -530,9 +530,37 @@ rmse_res %&gt;%
 &lt;img src="workflow_sets_files/figure-html/bayes-1.svg" width="90%" style="display: block; margin: auto;" /&gt;
 ]
 
+---
+# Bonus: Fast screening using racing
+
+Racing is an adaptive grid search method that only focuses on tuning parameter combinations that have a good probability of being the best results. 
+
+After an initial period, some tuning parameter combinations are removed if they have no chance of being best. 
+
+This reduces the overall number of model fits. 
+
+See Sections [13.4.4](https://www.tmwr.org/grid-search.html#racing) and [15.4](https://www.tmwr.org/workflow-sets.html#racing-example) of _Tidy Models with R_
 
 ---
-# Bonus: Create an ensemble via stacking
+# Bonus: Fast screening using racing
+
+To use it, map over `"tune_race_anova"` or `"tune_race_win_loss"` after loading the `finetune` package:
+
+
+```r
+library(finetune)
+racing_res &lt;- 
+  chicago_res %&gt;% 
+  workflow_map("tune_race_anova",
+               resamples = chicago_rs,
+               seed = 1, 
+               grid = 20,
+               metrics = metric_set(rmse))
+```
+
+
+---
+# Bonus Bonus: Create an ensemble via stacking
 
 
 ```r
@@ -547,6 +575,8 @@ ens &lt;-
 This requires the devel version of `stacks` and you will have had to save the out-of-sample predictions for each model (via a `control` argument).
 
 This is similar to the approach taken in [h2o AutoML](https://docs.h2o.ai/h2o/latest-stable/h2o-docs/automl.html). 
+
+See [`stacks.tidymodels.org`](https://stacks.tidymodels.org/) and the upcoming [Chapter 20 of _Tidy Models with R_](https://www.tmwr.org/ensemble.html) for more information. 
 
 ---
 # Model selection/variable assessment 
@@ -622,7 +652,7 @@ full_model &lt;-
 .pull-right[
 Estimate the mean absolute error for various predictor subsets. 
 
-If the loss of performance is good, it implies that the predictor was important. 
+If the predictor is important, removing it makes performance worse.
 ]
 
 

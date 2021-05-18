@@ -198,7 +198,7 @@ modeling_data <-
   prep(pca_rec, training = Chicago) %>% 
   bake(new_data = NULL)
 
-bad <- fit(reg_model, chicago_train)
+bad <- fit(reg_model, modeling_data)
 
 predict(bad, chicago_test)
 ```
@@ -324,7 +324,7 @@ chicago_res <-
   workflow_map(resamples = chicago_rs,
                seed = 1, 
                # Optional arguments to tune_grid()
-               grid = 10,
+               grid = 20,
                metrics = metric_set(rmse))
 ```
 
@@ -419,7 +419,7 @@ filtered_res <-
   workflow_map(resamples = chicago_rs,
                seed = 1, 
                # Optional arguments to tune_grid()
-               grid = 10,
+               grid = 20,
                metrics = metric_set(rmse))
 ```
 
@@ -498,9 +498,36 @@ rmse_res %>% autoplot(type = "ROPE", size = 0.15)
 ```
 ]
 
+---
+# Bonus: Fast screening using racing
+
+Racing is an adaptive grid search method that only focuses on tuning parameter combinations that have a good probability of being the best results. 
+
+After an initial period, some tuning parameter combinations are removed if they have no chance of being best. 
+
+This reduces the overall number of model fits. 
+
+See Sections [13.4.4](https://www.tmwr.org/grid-search.html#racing) and [15.4](https://www.tmwr.org/workflow-sets.html#racing-example) of _Tidy Models with R_
 
 ---
-# Bonus: Create an ensemble via stacking
+# Bonus: Fast screening using racing
+
+To use it, map over `"tune_race_anova"` or `"tune_race_win_loss"` after loading the `finetune` package:
+
+```{r race, eval = FALSE}
+library(finetune)
+racing_res <- 
+  chicago_res %>% 
+  workflow_map("tune_race_anova",
+               resamples = chicago_rs,
+               seed = 1, 
+               grid = 20,
+               metrics = metric_set(rmse))
+```
+
+
+---
+# Bonus Bonus: Create an ensemble via stacking
 
 ```{r stacks, eval = FALSE}
 library(stacks)
@@ -514,6 +541,8 @@ ens <-
 This requires the devel version of `stacks` and you will have had to save the out-of-sample predictions for each model (via a `control` argument).
 
 This is similar to the approach taken in [h2o AutoML](https://docs.h2o.ai/h2o/latest-stable/h2o-docs/automl.html). 
+
+See [`stacks.tidymodels.org`](https://stacks.tidymodels.org/) and the upcoming [Chapter 20 of _Tidy Models with R_](https://www.tmwr.org/ensemble.html) for more information. 
 
 ---
 # Model selection/variable assessment 
@@ -573,7 +602,7 @@ full_model <-
 .pull-right[
 Estimate the mean absolute error for various predictor subsets. 
 
-If the loss of performance is big, it implies that the predictor was important. 
+If the predictor is important, removing it makes performance worse.
 ]
 
 
