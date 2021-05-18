@@ -70,12 +70,12 @@ In tidymodels, there is the idea that a model-oriented data analysis consists of
  - a preprocessor, and 
  - a model
  
-The preprocessor might be a simple formula or a sophisticated recipes.  
+The preprocessor might be a simple formula or a sophisticated recipe.  
 
-It's important to consider both of these activities as part of the data analysis process
+It's important to consider both of these activities as part of the data analysis process.
 
- - post-model activities should also be included there (e.g. calibration, cut-off optimization, etc.)
- - we don't have those implemented yet. 
+ - Post-model activities should also be included there (e.g. calibration, cut-off optimization, etc.)
+ - We don't have those implemented yet. 
 
 
 ---
@@ -258,7 +258,7 @@ These are objects that contain multiple workflows.
 
 They can be estimated, evaluates, and ranked with simple APIs. 
 
-Let's create one by crossing several recipes with two models for the Chicago data
+Let's create one by crossing several recipes with two models for the Chicago data.
 
 ---
 # Example objects
@@ -573,7 +573,7 @@ full_model <-
 .pull-right[
 Estimate the mean absolute error for various predictor subsets. 
 
-If the loss of performance is good, it implies that the predictor was important. 
+If the loss of performance is big, it implies that the predictor was important. 
 ]
 
 
