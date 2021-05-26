@@ -1,5 +1,5 @@
 ---
-title: "Creating model _en mass_ with workflow sets"
+title: "Creating models _en mass_ with workflow sets"
 author: Max Kuhn
 date: "2021-05-18"
 output:
@@ -87,7 +87,7 @@ knitr::include_graphics("images/blocks.png")
 
 
 ---
-# A relavant example
+# A relevant example
 
 Let's say that we have some highly correlated predictors and we want to reduce the correlation by first applying principal component analysis to the data. 
 
@@ -130,11 +130,11 @@ knitr::include_graphics("images/the-model.svg")
 ---
 # What's the difference?
 
-It is easy to think that the model fit is the only estimation steps. 
+It is easy to think that the model fit is the only estimation step. 
 
 There are cases where this could go really wrong: 
 
-* Poor estimation of performance (buy treating the PCA parts as known)
+* Poor estimation of performance (by treating the PCA parts as known)
 
 * Selection bias in feature selection
 
@@ -215,7 +215,7 @@ predict(good, chicago_test)
 ---
 # Many workflows
 
-You can imagine a case where, for a new data set, we don't know what predictors, features, or model are most effective.
+You can imagine a case where, for a new data set, we don't know what predictors, features, or models are most effective.
 
 .font80[
 
@@ -256,7 +256,7 @@ I was hesitant to even create this package since it might be used inappropriatel
 
 These are objects that contain multiple workflows. 
 
-They can be estimated, evaluates, and ranked with simple APIs. 
+They can be estimated, evaluated, and ranked with simple APIs. 
 
 Let's create one by crossing several recipes with two models for the Chicago data.
 
@@ -408,7 +408,7 @@ nnet_param <-
 ---
 # Passing individual options to models
 
-Now let's update the `option` file for those two workflows and refit: 
+Now let's update the `option` information for those two workflows and refit: 
 
 ```{r updates, cache = TRUE}
 filtered_res <- 
